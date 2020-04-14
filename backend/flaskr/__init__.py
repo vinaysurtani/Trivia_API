@@ -63,11 +63,9 @@ def create_app(test_config=None):
   def get_questions():
     cats=Category.query.order_by(Category.id).all()
     selection=Question.query.order_by(Question.id).all()
-    if len(selection)==0:
-      abort(404)
-    if len(cats)==0:
-      abort(404)
     current_questions=paginate_questions(request,selection)
+    if len(current_questions)==0:
+      abort(404)
 
     return jsonify({
       'success':True,
@@ -114,7 +112,7 @@ def create_app(test_config=None):
   def new_question():
     body=request.get_json()
     if not ('question' in body and 'answer' in body and 'category' in body and 'difficulty' in body):
-      abort(404)
+      abort(422)
     try:
       new_question=body.get('question')
       new_answer=body.get('answer')
@@ -125,6 +123,7 @@ def create_app(test_config=None):
       question.insert()
       return jsonify({
         'success':True,
+        'created':question_id
       })
     except:
       abort(422)
@@ -191,7 +190,7 @@ def create_app(test_config=None):
       body=request.get_json()
       category=body.get('quiz_category')
       previous_questions=body.get('previous_questions')
-      if not('category' in body and 'previous_questions' in body):
+      if category is None or previous_questions is None:
         abort(404)
       else:
         question_set=Question.query.filter(category==category['id']).filter(Question.id.notin_(previous_questions)).all()

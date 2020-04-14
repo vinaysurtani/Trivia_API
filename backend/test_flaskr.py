@@ -60,9 +60,9 @@ class TriviaTestCase(unittest.TestCase):
         self.assertTrue(data['total_questions'])
 
     def test_404_no_questions(self):
-        res=self.client().get('/questions?page=1111')
+        res=self.client().get('/questions?page=1000')
         data=json.loads(res.data)
-        self.assertEqual(res.status_code,404)
+        self.assertEqual(res.status_code,404)#----------------
         self.assertEqual(data['success'],False)
         self.assertEqual(data['message'],'not found')
 
@@ -73,19 +73,20 @@ class TriviaTestCase(unittest.TestCase):
         question=Question(question='a',answer='a',difficulty=1,category=1)
         question.insert()
         question_id=question.id
-        res=self.client().get(f'/questions/{question_id}')
+        res=self.client().delete(f'/questions/{question_id}')
+        data=json.loads(res.data)
         query=Question.query.filter(Question.id==question_id).one_or_none()
-        self.assertEqual(res.status_code,200)
+        self.assertEqual(res.status_code,200)#----------------
         self.assertEqual(data['success'],True)
-        self.assertEqual(data['deleted'],str(question_id))
+        self.assertEqual(data['deleted'],question_id)
         self.assertEqual(query,None)
 
-    def test_422_no_question(self):
-        res=self.client().delete('/questions/a')
-        data=json.loads(rs.data)
-        self.assertEqual(res.status_code,422)
+    def test_404_no_delete_question(self):
+        res=self.client().delete('/questions/c')
+        data=json.loads(res.data)#----------------
+        self.assertEqual(res.status_code,404)
         self.assertEqual(data['success'],False)
-        self.assertEqual(data['message'],'unprocessable')
+        self.assertEqual(data['message'],'not found')
 
 
 
@@ -101,24 +102,16 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(res.status_code,200)
         self.assertEqual(data['success'],True)
 
-    def test_404_missing_info_question(self):
+    def test_422_missing_info_question(self):
         new_question={
             'question':'a',
             'difficulty':1
         }
         res=self.client().post('/questions',json=new_question)
         data=json.loads(res.data)
-        self.assertEqual(res.status_code,404)
-        self.assertEqual(data['success'],False)
-        self.assertEqual(data['message'],'not found')
-
-    def test_422_new_question_error(self):
-        res=self.client().post('/questions')
-        data=json.loads(res.data)
         self.assertEqual(res.status_code,422)
         self.assertEqual(data['success'],False)
         self.assertEqual(data['message'],'unprocessable')
-
 
 
 
@@ -155,7 +148,7 @@ class TriviaTestCase(unittest.TestCase):
     def test_404_not_found_category_question(self):
         res=self.client().get('categories/999/questions')
         data=json.loads(res.data)
-        self.assertEqual(res.status_code,404)
+        self.assertEqual(res.status_code,404)#----------------
         self.assertEqual(data['success'],False)
         self.assertEqual(data['message'],'not found')
 
@@ -171,29 +164,19 @@ class TriviaTestCase(unittest.TestCase):
         }
         res=self.client().post('/quizzes',json=new_quiz)
         data=json.loads(res.data)
-        self.assertEqual(res.status_code,200)
+        self.assertEqual(res.status_code,200)#----------------
         self.assertEqual(data['success'],True)
-        self.assertTrue(data['question'])
 
 
-    def test_404_missing_info_quiz(self):
+    def test_422_missing_info_quiz(self):
         new_quiz={
             'previous_questions':[]
         }
-        res=self.client()post('/quizzes',json=new_quiz)
+        res=self.client().post('/quizzes',json=new_quiz)#----------------
         data=json.loads(res.data)
-        self.assertEqual(res.status_code,404)
-        self.assertEqual(data['success'],False)
-        self.assertEqual(data['message'],'not found')
-
-
-    def test_422_quiz_error(self):
-        res=self.client.post('/quizzes')
-        data=json.loads(res.data)
-        self.assertEqual(res.status_code,422)
+        self.assertEqual(res.status_code,422)#----------------
         self.assertEqual(data['success'],False)
         self.assertEqual(data['message'],'unprocessable')
-
 
 
 

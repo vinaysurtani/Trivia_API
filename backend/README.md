@@ -72,20 +72,144 @@ This README is missing documentation of your endpoints. Below is an example for 
 
 Endpoints
 GET '/categories'
-GET ...
-POST ...
-DELETE ...
+GET '/questions'
+POST '/questions'
+DELETE '/questions/<int:question_id>'
+POST '/questionSearch'
+GET '/categories/<int:category_id>/questions'
+POST '/quizzes'
 
 GET '/categories'
 - Fetches a dictionary of categories in which the keys are the ids and the value is the corresponding string of the category
 - Request Arguments: None
 - Returns: An object with a single key, categories, that contains a object of id: category_string key:value pairs. 
-{'1' : "Science",
-'2' : "Art",
-'3' : "Geography",
-'4' : "History",
-'5' : "Entertainment",
-'6' : "Sports"}
+{
+  "success": true,
+  "categories": {
+    "1": "Science", 
+    "2": "Art", 
+    "3": "Geography", 
+    "4": "History", 
+    "5": "Entertainment", 
+    "6": "Sports"
+  } 
+}
+
+GET '/questions'
+- Fetches the set of questions in a paginated format and returns 10 questions according to the set value of pagination.
+- Also fetches the total number of questions in the databaase along with the current category selected and the dictionary of categories.
+- Request Arguments: None
+- Returns: A object with a single key, questions, that contains an object of the list of the paginated questions for the current page, an object wtih the total number of questinons in integer format,the current category of the question and the dictionary of categories in the format of id: category key:value pairs
+{
+ "success":True, 
+ "questions": [
+   {
+     "answer": "Maya Angelou", 
+     "category": 4, 
+     "difficulty": 2, 
+     "id": 5, 
+     "question": "Whose autobiography is entitled 'I Know Why the Caged Bird Sings'?"
+   },  
+   {
+     "answer": "Escher", 
+     "category": 2, 
+     "difficulty": 1, 
+     "id": 16, 
+     "question": "Which Dutch graphic artist\u2013initials M C was a creator of optical illusions?"
+   }
+ ],
+ "total_questions": 2, 
+ "current_category": null,
+ "categories": {
+   "1": "Science", 
+   "2": "Art", 
+   "3": "Geography", 
+   "4": "History", 
+   "5": "Entertainment", 
+   "6": "Sports"
+ },
+}
+
+POST '/questions'
+- Creates a new question in the database, which takes input from use for question, answer, category and difficulty score.
+- Request body:{question:string, answer:string, difficulty:int, category:string}
+- Returns: An object with single key,success, assuring question is created.
+{
+  "success": true
+}
+
+
+DELETE '/questions/<int:question_id>'
+- Deletes a question from the database.
+- Request Arguments: int:question_id
+- Returns: A success object to confirm deletion, and the id of the question that is deleted.
+{
+  "deleted": "28", 
+  "success": true
+}
+
+POST '/questionSearch'
+- Fetches all questions which match the substring which is sent form input which is not case-sensitive.
+- Request Arguments: None
+- Request Body: {searchTerm:string}
+- Returns: A success object, to show it was successful, an object which contains the list of objects which match the given substring, the total number of questions and the current category.
+{
+  "success": true, 
+  "questions": [
+    {
+      "answer": "Lisbon", 
+      "category": 2, 
+      "difficulty": 1, 
+      "id": 29, 
+      "question": "What is the capital of Portugal?"
+    }
+  ], 
+  "total_questions": 1,
+  "current_category": null
+}
+
+GET '/categories/<int:category_id>/questions'
+- Fetches all the questions which are under a certain category.
+- Request Argument: int:category_id
+- Returns: A success object, the object containing the list of questions, the total number of questions and the current category of the question list.
+{
+  "success": true,
+  "questions": [
+    {
+      "answer": "The Liver", 
+      "category": 1, 
+      "difficulty": 4, 
+      "id": 20, 
+      "question": "What is the heaviest organ in the human body?"
+    }, 
+    {
+      "answer": "Alexander Fleming", 
+      "category": 1, 
+      "difficulty": 3, 
+      "id": 21, 
+      "question": "Who discovered penicillin?"
+    }, 
+  ], 
+  "total_questions": 2,
+  "current_category": 1
+}
+
+
+POST '/quizzes'
+- Fetches one random question according to the specified category and previous questions are not repeated.
+- Request body: {previous_questions: arr, quiz_category: {id:int, type:string}}
+- Returns: A success object and an object which holds the details of the generated question.
+{
+  "success": true,
+  "question": {
+    "answer": "The Liver", 
+    "category": 1, 
+    "difficulty": 4, 
+    "id": 20, 
+    "question": "What is the heaviest organ in the human body?"
+  }, 
+  
+}
 
 ```
 
